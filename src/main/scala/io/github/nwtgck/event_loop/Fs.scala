@@ -96,11 +96,15 @@ class Fs(eventLoop: EventLoop) {
     */
   def createReadStream(path: String): ReadableStream = new ReadableStream {
 
+    var buff: Array[Char] = new Array(8196)
     val reader = new BufferedReader(new FileReader(path)) // TODO error handling
 
     override def read(size: Int): String = {
-      val buff: Array[Char] = new Array(size)
-      val read: Int         = reader.read(buff)
+      if(size > buff.length){
+        // Resize buff
+        buff = new Array(size)
+      }
+      val read: Int = reader.read(buff, 0, size)
       if(read == -1) {
         ""
       } else {
