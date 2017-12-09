@@ -2,6 +2,12 @@
 
 This is just a imitation of Event Loop in Scala. Interface is inspired by Node.js.
 
+## Features
+
+* Single-thread asynchronous
+* No `java.lang.Thread`, No `scala.concurrent.Future`
+* No third-party libraries
+
 ## Usages
 
 ### Foreach
