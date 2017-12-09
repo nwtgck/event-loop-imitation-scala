@@ -23,7 +23,7 @@ abstract class EventLoop {
   /**
     * A queue of timered events
     */
-  private[this] var timeredEvents: TimeredEvents = new TimeredEvents()
+  private[this] val timeredEvents: TimeredEvents = new TimeredEvents()
 
   /**
     * Next tick
