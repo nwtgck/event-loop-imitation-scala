@@ -23,7 +23,7 @@ abstract class EventLoop {
   /**
     * A queue of timered events
     */
-  private[this] var timeredEvents: List[(Date, Unit => Unit)] = List.empty
+  private[this] var timeredEvents: TimeredEvents = new TimeredEvents()
 
   /**
     * Next tick
@@ -34,7 +34,8 @@ abstract class EventLoop {
   }
 
   def setTimeout(event: Unit => Unit, millis: Long): Unit = {
-    timeredEvents =  timeredEvents :+ (new Date(currentDate.getTime+millis), event)
+    // Append preserving order
+    timeredEvents += ((new Date(currentDate.getTime+millis), event))
   }
 
   /**
@@ -57,19 +58,15 @@ abstract class EventLoop {
 
 
   /**
-    * Run a timer event
+    * Run timer events
     */
   private[this] def runTimeredEvent(): Unit = {
-    // Find index
-    val idx = timeredEvents.indexWhere { a => a._1.compareTo(currentDate) < 0 }
+    // Get hot events
+    val hostEvents = timeredEvents.deleteAndGetHotEvents(currentDate)
 
-    if (idx != -1) {
+    for(event <- hostEvents){
       // Execute event
-      val (_, event) = timeredEvents(idx)
       event()
-      // Delete the element
-      timeredEvents = timeredEvents.take(idx) ++ timeredEvents.drop(idx + 1)
-
     }
   }
 
@@ -86,7 +83,7 @@ abstract class EventLoop {
       // Run next-tick events
       runNextTickEvents()
 
-      // Run a timer event
+      // Run timer events
       runTimeredEvent()
     }
   }
