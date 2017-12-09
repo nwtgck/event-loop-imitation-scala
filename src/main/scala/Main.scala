@@ -58,5 +58,18 @@ object Main extends EventLoop {
         println(s"filteredSeq: ${filteredSeq}")
       }
     )
+
+    setTimeout(_ => {
+      println("(1000) hello, world")
+    }, 1000)
+
+    setTimeout(_ => {
+      println("(100) hello, world")
+    }, 100)
+
+    setTimeout(_ => {
+      println("(1000) hello, world")
+    }, 1000)
+
   }
 }
