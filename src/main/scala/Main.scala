@@ -175,7 +175,7 @@ object Main extends EventLoop {
 
     }
 
-    if(false){
+    if(true){
       async
         .foreach(1 to 10, (i: Int) => Promise.resolved{
           println(s"async(1) i: ${i}")
@@ -188,7 +188,7 @@ object Main extends EventLoop {
         })
     }
 
-    if(true){
+    if(false){
 
 
       val stream: fs.ReadableStream = fs.createReadStream("./build.sbt")

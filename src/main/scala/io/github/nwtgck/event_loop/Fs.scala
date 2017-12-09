@@ -11,11 +11,13 @@ class Fs(eventLoop: EventLoop) {
     protected[this] var onDataCallbacks: List[String => Unit] = List.empty
     protected[this] var onEndCallbacks : List[Unit => Unit]   = List.empty
 
-    final def onData(f: String => Unit): Unit = {
+    final def onData(f: String => Unit): ReadableStream = {
       onDataCallbacks :+= f
+      this
     }
-    final def onEnd(f : Unit => Unit): Unit = {
+    final def onEnd(f : Unit => Unit): ReadableStream = {
       onEndCallbacks  :+= f
+      this
     }
   }
 
@@ -26,26 +28,17 @@ class Fs(eventLoop: EventLoop) {
     */
   def readFile(path: String): Promise[String] = new Promise[String]{
     val builder: StringBuilder = new StringBuilder()
-    val buff   : Array[Char]   = new Array(8196)
-    val reader = new BufferedReader(new FileReader(path)) // TODO error handling
-
-    def readLoop(): Unit = {
-      val read: Int = reader.read(buff)
-      if(read == -1){
+    createReadStream(path)
+      .onData(data => {
+        builder.append(data)
+      })
+      .onEnd(_ => {
         resolve(builder.toString())
-      } else {
-        val string = new String(buff, 0, read)
-        builder.append(string)
-        eventLoop.nextTick{
-          readLoop()
-        }
-      }
-    }
-    readLoop()
+      })
   }
 
   def createReadStream(path: String): ReadableStream = new ReadableStream {
-    
+
     val buff   : Array[Char]   = new Array(8196)
     val reader = new BufferedReader(new FileReader(path)) // TODO error handling
 
