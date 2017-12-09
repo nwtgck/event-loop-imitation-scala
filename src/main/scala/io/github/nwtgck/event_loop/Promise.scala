@@ -13,7 +13,7 @@ object Promise{
 class Promise[Res] {
   sealed trait State
   case object Pending    extends State
-  case object Fullfilled extends State
+  case object Fulfilled  extends State
   case object Rejected   extends State
 
   private[this] var state             : State            = Pending
@@ -22,7 +22,7 @@ class Promise[Res] {
   private       var rejectSubscribers : Seq[Throwable => Unit] = Seq.empty
 
   def resolve(res: Res): Unit = {
-    state = Fullfilled
+    state = Fulfilled
     value = res
     for(s <- resolveSubscribers){
       s(value)
@@ -40,7 +40,7 @@ class Promise[Res] {
     val nextPromise = new Promise[Next]()
 
     state match {
-      case Fullfilled =>
+      case Fulfilled =>
         val promise = f(value)
         promise.resolveSubscribers :+= {nextValue: Next =>
           nextPromise.resolve(nextValue)
