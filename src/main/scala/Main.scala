@@ -77,44 +77,65 @@ object Main extends EventLoop {
       }, 1000)
     }
 
-    setTimeout(_ => {
-      println("(0) setTimeout1")
-    }, 0)
 
-    setTimeout(_ => {
-      println("(0) setTimeout2")
-    }, 0)
+    if (false) {
+      setTimeout(_ => {
+        println("(0) setTimeout1")
+      }, 0)
 
-    setTimeout(_ => {
-      println("(0) setTimeout3")
-    }, 0)
+      setTimeout(_ => {
+        println("(0) setTimeout2")
+      }, 0)
 
-    nextTick{
-      println("nextTick1")
-      nextTick{
-        println("nextTick4")
-      }
-    }
+      setTimeout(_ => {
+        println("(0) setTimeout3")
+      }, 0)
 
-    nextTick{
-      println("nextTick2")
-    }
-
-    nextTick{
-      println("nextTick3")
-    }
-
-
-    async
-      .mapPromise(
-        Vector(1, 2, 3, 4, 5),
-        (i: Int) => {
-          i * i
+      nextTick {
+        println("nextTick1")
+        nextTick {
+          println("nextTick4")
         }
-      )
-      .andThen((mapedSeq: Seq[Int]) => {
-        println(s"mapedSeq: ${mapedSeq}")
-      })
+      }
+
+      nextTick {
+        println("nextTick2")
+      }
+
+      nextTick {
+        println("nextTick3")
+      }
+
+
+      async
+        .mapPromise(
+          Vector(1, 2, 3, 4, 5),
+          (i: Int) => {
+            i * i
+          }
+        )
+        .andThen((mapedSeq: Seq[Int]) => {
+          println(s"mapedSeq: ${mapedSeq}")
+        })
+    }
+
+    if(true){
+      async
+        .foreach(1 to 10, (i: Int) => {
+          println(s"async(1) i: ${i}")
+        })
+        .andThen { _ =>
+          println("End loop(1)")
+        }
+
+      async
+        .foreach(1 to 20, (i: Int) => {
+          println(s"async(2) i: ${i}")
+        })
+        .andThen { _ =>
+          println("End loop(2)")
+        }
+    }
 
   }
 }

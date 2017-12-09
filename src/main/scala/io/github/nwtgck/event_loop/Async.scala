@@ -8,7 +8,7 @@ class Async(eventLoop: EventLoop) {
     * @param f
     * @tparam A
     */
-  def foreach[A](seq: Seq[A], f: A => Unit): Unit = {
+  def foreach[A](seq: Seq[A], f: A => Unit): Promise[Unit] = new Promise[Unit]{
     seq.headOption match {
       case Some(elem) =>
         // Execute process
@@ -16,8 +16,10 @@ class Async(eventLoop: EventLoop) {
         // Go to next step
         eventLoop.nextTick{
           foreach(seq.drop(1), f)
+            .andThen(resolve)
         }
-      case _ => () // End of looop
+      case _ =>
+        resolve(()) // End of loop
     }
   }
 
