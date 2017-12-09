@@ -1,4 +1,4 @@
-import io.github.nwtgck.event_loop.{Async, EventLoop, Fs, Promise}
+import io.github.nwtgck.event_loop._
 
 object Main extends EventLoop {
 
@@ -191,7 +191,7 @@ object Main extends EventLoop {
     if(false){
 
 
-      val stream: fs.ReadableStream = fs.createReadStream("./build.sbt")
+      val stream: ReadableStream = fs.createReadStream("./build.sbt")
 
       stream.onData((data: String) => {
         println(data)
