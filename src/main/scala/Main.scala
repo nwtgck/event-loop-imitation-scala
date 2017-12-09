@@ -1,4 +1,4 @@
-import io.github.nwtgck.event_loop.{Async, EventLoop, Promise}
+import io.github.nwtgck.event_loop.{Async, EventLoop, Fs, Promise}
 
 object Main extends EventLoop {
 
@@ -10,6 +10,8 @@ object Main extends EventLoop {
   override protected[this] def entryPoint(args: Array[String]): Unit = {
 
     val async = new Async(this: EventLoop)
+    val fs    = new Fs(this: EventLoop)
+
 
     if(false) {
 
@@ -115,7 +117,7 @@ object Main extends EventLoop {
         })
     }
 
-    if(true){
+    if(false){
       async
         .foreach(1 to 10, (i: Int) => Promise.resolved{
           println(s"async(1) i: ${i}")
@@ -171,6 +173,19 @@ object Main extends EventLoop {
         println(s"seq2: ${seq2}")
       }
 
+    }
+
+    if(true){
+      async
+        .foreach(1 to 10, (i: Int) => Promise.resolved{
+          println(s"async(1) i: ${i}")
+        })
+
+      fs
+        .readFile("./build.sbt")
+        .andThen((content: String) => Promise.resolved{
+          println(content)
+        })
     }
 
   }
