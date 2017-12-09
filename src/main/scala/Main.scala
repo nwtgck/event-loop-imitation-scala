@@ -60,15 +60,18 @@ object Main extends EventLoop {
     )
 
     setTimeout(_ => {
-      println("(1000) hello, world")
+      println("(1000) hello, world1")
     }, 1000)
 
     setTimeout(_ => {
-      println("(100) hello, world")
-    }, 100)
+      println("(1000) hello, world2")
+      nextTick{
+        println("nextTick1")
+      }
+    }, 1000)
 
     setTimeout(_ => {
-      println("(1000) hello, world")
+      println("(1000) hello, world3")
     }, 1000)
 
   }

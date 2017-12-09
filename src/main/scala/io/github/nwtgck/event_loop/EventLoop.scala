@@ -11,6 +11,11 @@ import scala.collection.mutable
 abstract class EventLoop {
 
   /**
+    * Current date (this will be updated in event loop)
+    */
+  private[this] var currentDate: Date = new Date()
+
+  /**
     * A queue of events
     */
   private[this] val eventQueue       : mutable.Queue[Unit => Unit] = mutable.Queue.empty
@@ -29,8 +34,7 @@ abstract class EventLoop {
   }
 
   def setTimeout(event: Unit => Unit, millis: Long): Unit = {
-    val currentDate: Date = new Date()
-    timeredEvents = (new Date(currentDate.getTime+millis), event) +: timeredEvents
+    timeredEvents =  timeredEvents :+ (new Date(currentDate.getTime+millis), event)
   }
 
   /**
@@ -44,8 +48,6 @@ abstract class EventLoop {
     * Run a timer event
     */
   private[this] def runTimeredEvent(): Unit = {
-    // Get current date
-    val currentDate: Date = new Date()
     // Find index
     val idx = timeredEvents.indexWhere { a => a._1.compareTo(currentDate) < 0 }
 
@@ -66,6 +68,9 @@ abstract class EventLoop {
     nextTick(mainEvent)
     // Event loop
     while(eventQueue.nonEmpty || timeredEvents.nonEmpty){
+
+      // Update current date
+      currentDate = new Date()
 
       // Run a timer event
       runTimeredEvent()
