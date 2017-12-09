@@ -35,7 +35,7 @@ class Async(eventLoop: EventLoop) {
       case x +: xs =>
         eventLoop.nextTick {
           val mapedX: B = f(x)
-          map(xs, f).andThen((mappedXs: Seq[B]) => Promise.resolved{
+          Async.this.map(xs, f).andThen((mappedXs: Seq[B]) => Promise.resolved{
             resolve(mapedX +: mappedXs)
           })
         }
