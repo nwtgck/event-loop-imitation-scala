@@ -44,6 +44,28 @@ class Async(eventLoop: EventLoop) {
   }
 
   /**
+    * Async map
+    * @param seq
+    * @param f
+    * @tparam A
+    * @tparam B
+    */
+  def mapPromise[A, B](seq: Seq[A], f: A => B): Promise[Seq[B]] = new Promise[Seq[B]]{
+    seq match {
+      case x +: xs =>
+        eventLoop.nextTick {
+          val mapedX: B = f(x)
+          map(xs, f, (mapedXs: Seq[B]) => {
+            resolve(mapedX +: mapedXs)
+          })
+        }
+      case Nil     =>
+        resolve(Nil)
+    }
+  }
+
+
+  /**
     * Async filter
     * @param seq
     * @param p
