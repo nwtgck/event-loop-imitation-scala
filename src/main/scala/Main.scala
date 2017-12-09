@@ -152,7 +152,11 @@ object Main extends EventLoop {
         )
         .andThen((filteredSeq: Seq[Int]) => {
           println(s"filteredSeq: ${filteredSeq}")
+          filteredSeq.length
         })
+        .andThen((length: Int) =>
+          println(s"length: ${length}")
+        )
     }
 
   }

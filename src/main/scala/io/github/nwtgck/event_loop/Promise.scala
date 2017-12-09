@@ -25,13 +25,28 @@ class Promise[Res] {
     }
   }
 
-  def andThen(f: Res => Unit): Promise[Res] = {
+//  def andThen(f: Res => Unit): Promise[Res] = {
+//    if(state == Fullfilled){
+//      f(value)
+//    } else {
+//      resolveSubscribers :+= f
+//    }
+//    this
+//  }
+
+  def andThen[Next](f: Res => Next): Promise[Next] = {
+    val nextPromise = new Promise[Next]()
     if(state == Fullfilled){
-      f(value)
+      val nextValue: Next = f(value)
+      nextPromise.resolve(nextValue)
     } else {
-      resolveSubscribers :+= f
+      resolveSubscribers :+= {(res: Res) =>
+        val nextValue: Next = f(res)
+        nextPromise.resolve(nextValue)
+        ()
+      }
     }
-    this
+    nextPromise
   }
 
 }
