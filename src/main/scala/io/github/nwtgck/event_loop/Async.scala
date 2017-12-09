@@ -42,4 +42,24 @@ class Async(eventLoop: EventLoop) {
         resultCallback(Nil)
     }
   }
+
+  /**
+    * Async filter
+    * @param seq
+    * @param p
+    * @param resultCallback
+    * @tparam A
+    */
+  def filter[A](seq: Seq[A], p: A => Boolean, resultCallback: Seq[A] => Unit): Unit = {
+    seq match {
+      case x +: xs =>
+        eventLoop.nextTick {
+          filter(xs, p, (filteredXs: Seq[A]) => {
+            resultCallback(if(p(x)) x +: filteredXs else filteredXs)
+          })
+        }
+      case Nil     =>
+        resultCallback(Nil)
+    }
+  }
 }

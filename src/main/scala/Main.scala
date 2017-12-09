@@ -48,5 +48,15 @@ object Main extends EventLoop {
         println(s"mapedSeq: ${mapedSeq}")
       }
     )
+
+    async.filter(
+      1 to 20,
+      (i :Int) => {
+        i % 2 == 0
+      },
+      (filteredSeq: Seq[Int]) => {
+        println(s"filteredSeq: ${filteredSeq}")
+      }
+    )
   }
 }
