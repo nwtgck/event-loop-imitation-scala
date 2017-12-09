@@ -11,7 +11,26 @@ class Fs(eventLoop: EventLoop) {
     private[this] var onDataCallbacks: List[String => Unit] = List.empty
     private[this] var onEndCallbacks : List[Unit => Unit]   = List.empty
 
+    private[this] def readLoop(): Unit = {
+      val data: String = read(8196)
+      if(data == ""){
+        // Notify on-end
+        notifyOnEnd()
+      } else {
+        // Notify on-data
+        notifyOnData(data)
+        eventLoop.nextTick{
+          readLoop()
+        }
+      }
+    }
 
+    // Delay to nextTick
+    eventLoop.nextTick{
+      readLoop()
+    }
+
+    def read(size: Int): String
 
     final def onData(f: String => Unit): ReadableStream = {
       onDataCallbacks :+= f
@@ -77,27 +96,16 @@ class Fs(eventLoop: EventLoop) {
     */
   def createReadStream(path: String): ReadableStream = new ReadableStream {
 
-    val buff   : Array[Char]   = new Array(8196)
     val reader = new BufferedReader(new FileReader(path)) // TODO error handling
 
-    def readLoop(): Unit = {
-      val read: Int = reader.read(buff)
-      if(read == -1){
-        // Notify on-end
-        notifyOnEnd()
+    override def read(size: Int): String = {
+      val buff: Array[Char] = new Array(size)
+      val read: Int         = reader.read(buff)
+      if(read == -1) {
+        ""
       } else {
-        val data = new String(buff, 0, read)
-        // Notify on-data
-        notifyOnData(data)
-        eventLoop.nextTick{
-          readLoop()
-        }
+        new String(buff, 0, read)
       }
-    }
-
-    // Delay to nextTick
-    eventLoop.nextTick{
-      readLoop()
     }
   }
 
