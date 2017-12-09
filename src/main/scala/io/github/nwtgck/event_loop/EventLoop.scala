@@ -18,7 +18,7 @@ abstract class EventLoop {
   /**
     * A queue of events
     */
-  private[this] val eventQueue       : mutable.Queue[Unit => Unit] = mutable.Queue.empty
+  private[this] val nextTickEvents       : mutable.ListBuffer[Unit => Unit] = mutable.ListBuffer.empty
 
   /**
     * A queue of timered events
@@ -30,7 +30,7 @@ abstract class EventLoop {
     * @param event
     */
   def nextTick(event: => Unit): Unit = {
-    eventQueue.enqueue(_ => event)
+    nextTickEvents += (_ => event)
   }
 
   def setTimeout(event: Unit => Unit, millis: Long): Unit = {
@@ -42,6 +42,18 @@ abstract class EventLoop {
     * @param args
     */
   protected[this] def entryPoint(args: Array[String]): Unit
+
+
+  /**
+    * Run next-tick events
+    */
+  private[this] def runNextTickEvents(): Unit = {
+    val clonedEventQueue = nextTickEvents.clone
+    nextTickEvents.clear()
+    for (event <- clonedEventQueue) {
+      event()
+    }
+  }
 
 
   /**
@@ -62,25 +74,20 @@ abstract class EventLoop {
   }
 
   def main(args: Array[String]): Unit ={
-    // Get main event
-    lazy val mainEvent: Unit = entryPoint(args)
-    // Put main event to queue
-    nextTick(mainEvent)
+    // Run entry point
+    entryPoint(args)
+
     // Event loop
-    while(eventQueue.nonEmpty || timeredEvents.nonEmpty){
+    while(nextTickEvents.nonEmpty || timeredEvents.nonEmpty){
 
       // Update current date
       currentDate = new Date()
 
+      // Run next-tick events
+      runNextTickEvents()
+
       // Run a timer event
       runTimeredEvent()
-
-      if(eventQueue.nonEmpty) {
-        // Execute event
-        val event: Unit => Unit = eventQueue.dequeue()
-        event()
-      }
-
     }
   }
 
