@@ -52,11 +52,10 @@ object Main extends EventLoop {
         1 to 20,
         (i: Int) => {
           i % 2 == 0
-        },
-        (filteredSeq: Seq[Int]) => {
-          println(s"filteredSeq: ${filteredSeq}")
         }
-      )
+      ).andThen((filteredSeq: Seq[Int]) => {
+        println(s"filteredSeq: ${filteredSeq}")
+      })
 
       setTimeout(_ => {
         println("(1000) hello, world1")
@@ -142,6 +141,17 @@ object Main extends EventLoop {
         )
         .andThen((mappedSeq: Seq[Int]) => {
           println(s"mappedSeq: ${mappedSeq}")
+        })
+
+      async
+        .filter(
+          1 to 15,
+          (i: Int) => {
+            i % 2 == 0
+          }
+        )
+        .andThen((filteredSeq: Seq[Int]) => {
+          println(s"filteredSeq: ${filteredSeq}")
         })
     }
 
