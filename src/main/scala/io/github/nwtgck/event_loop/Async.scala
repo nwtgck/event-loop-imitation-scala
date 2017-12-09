@@ -16,7 +16,7 @@ class Async(eventLoop: EventLoop) {
         // Go to next step
         eventLoop.nextTick{
           foreach(seq.drop(1), f)
-            .andThen(resolve)
+            .andThen(res => Promise.resolved(resolve()))
         }
       case _ =>
         resolve(()) // End of loop
@@ -35,7 +35,7 @@ class Async(eventLoop: EventLoop) {
       case x +: xs =>
         eventLoop.nextTick {
           val mapedX: B = f(x)
-          map(xs, f).andThen((mappedXs: Seq[B]) => {
+          map(xs, f).andThen((mappedXs: Seq[B]) => Promise.resolved{
             resolve(mapedX +: mappedXs)
           })
         }
@@ -55,7 +55,7 @@ class Async(eventLoop: EventLoop) {
     seq match {
       case x +: xs =>
         eventLoop.nextTick {
-          filter(xs, p).andThen((filteredXs: Seq[A]) => {
+          filter(xs, p).andThen((filteredXs: Seq[A]) => Promise.resolved{
             resolve(if(p(x)) x +: filteredXs else filteredXs)
           })
         }

@@ -1,4 +1,4 @@
-import io.github.nwtgck.event_loop.{Async, EventLoop}
+import io.github.nwtgck.event_loop.{Async, EventLoop, Promise}
 
 object Main extends EventLoop {
 
@@ -26,7 +26,7 @@ object Main extends EventLoop {
         (i: Int) => {
           i * i
         }
-      ).andThen((mappedSeq: Seq[Int]) => {
+      ).andThen((mappedSeq: Seq[Int]) => Promise.resolved{
         println(s"mappedSeq: ${mappedSeq}")
       })
 
@@ -35,7 +35,7 @@ object Main extends EventLoop {
         (i: Int) => {
           i * i
         }
-      ).andThen((mappedSeq: Seq[Int]) => {
+      ).andThen((mappedSeq: Seq[Int]) => Promise.resolved{
         println(s"mappedSeq: ${mappedSeq}")
       })
 
@@ -44,7 +44,7 @@ object Main extends EventLoop {
         (i: Int) => {
           i * i
         }
-      ).andThen((mappedSeq: Seq[Int]) => {
+      ).andThen((mappedSeq: Seq[Int]) => Promise.resolved{
         println(s"mappedSeq: ${mappedSeq}")
       })
 
@@ -53,7 +53,7 @@ object Main extends EventLoop {
         (i: Int) => {
           i % 2 == 0
         }
-      ).andThen((filteredSeq: Seq[Int]) => {
+      ).andThen((filteredSeq: Seq[Int]) => Promise.resolved{
         println(s"filteredSeq: ${filteredSeq}")
       })
 
@@ -110,27 +110,27 @@ object Main extends EventLoop {
             i * i
           }
         )
-        .andThen((mappedSeq: Seq[Int]) => {
+        .andThen((mappedSeq: Seq[Int]) => Promise.resolved{
           println(s"mappedSeq: ${mappedSeq}")
         })
     }
 
     if(true){
       async
-        .foreach(1 to 10, (i: Int) => {
+        .foreach(1 to 10, (i: Int) => Promise.resolved{
           println(s"async(1) i: ${i}")
         })
-        .andThen { _ =>
+        .andThen ( _ => Promise.resolved{
           println("End loop(1)")
-        }
+        })
 
       async
-        .foreach(1 to 20, (i: Int) => {
+        .foreach(1 to 20, (i: Int) => Promise.resolved{
           println(s"async(2) i: ${i}")
         })
-        .andThen { _ =>
+        .andThen ( _ => Promise.resolved{
           println("End loop(2)")
-        }
+        })
 
       async
         .map(
@@ -139,7 +139,7 @@ object Main extends EventLoop {
             i * i
           }
         )
-        .andThen((mappedSeq: Seq[Int]) => {
+        .andThen((mappedSeq: Seq[Int]) => Promise.resolved{
           println(s"mappedSeq: ${mappedSeq}")
         })
 
@@ -150,13 +150,13 @@ object Main extends EventLoop {
             i % 2 == 0
           }
         )
-        .andThen((filteredSeq: Seq[Int]) => {
+        .andThen((filteredSeq: Seq[Int]) => Promise.resolved{
           println(s"filteredSeq: ${filteredSeq}")
           filteredSeq.length
         })
-        .andThen((length: Int) =>
+        .andThen((length: Int) => Promise.resolved {
           println(s"length: ${length}")
-        )
+        })
     }
 
   }
