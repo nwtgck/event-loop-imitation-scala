@@ -57,4 +57,10 @@ class Promise[Res] {
     nextPromise
   }
 
+  def map[B](f: Res => B): Promise[B] =
+    andThen((res: Res) => Promise.resolved(f(res)))
+
+  def flatMap[B](f: Res => Promise[B]): Promise[B] =
+    andThen(f)
+
 }

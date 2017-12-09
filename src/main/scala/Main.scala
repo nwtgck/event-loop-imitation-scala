@@ -151,12 +151,26 @@ object Main extends EventLoop {
           }
         )
         .andThen((filteredSeq: Seq[Int]) => Promise.resolved{
+
+          async.foreach(filteredSeq, (e: Int) => {
+            println(s"filtered e: ${e}")
+          })
+
           println(s"filteredSeq: ${filteredSeq}")
           filteredSeq.length
         })
         .andThen((length: Int) => Promise.resolved {
           println(s"length: ${length}")
         })
+
+
+      for{
+        seq1 <- async.map(1 to 10, (i: Int) => i * 5)
+        seq2 <- async.filter(seq1, (i: Int) => i % 2 == 0)
+      } yield {
+        println(s"seq2: ${seq2}")
+      }
+
     }
 
   }
