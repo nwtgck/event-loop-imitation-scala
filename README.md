@@ -1,6 +1,6 @@
-# Event Loop in Scala
+# Imitation of Event Loop
 
-This is just a imitation of Node.js in Scala
+This is just a imitation of Node.js in Scala.
 
 ## Usages
 
