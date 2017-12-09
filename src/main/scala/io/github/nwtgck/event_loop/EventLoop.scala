@@ -1,11 +1,12 @@
+package io.github.nwtgck.event_loop
+
 import scala.collection.mutable
 
 /**
-  * EventLoop
+  * io.github.nwtgck.event_loop.EventLoop
   * Mutable class
   */
 abstract class EventLoop {
-
 
   /**
     * A queue of events
