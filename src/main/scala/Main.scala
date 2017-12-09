@@ -19,5 +19,34 @@ object Main extends EventLoop {
       println(s"async(2) i: ${i}")
     })
 
+    async.map(
+      Seq(1, 2, 3, 4, 5),
+      (i :Int) => {
+        i * i
+      },
+      (mapedSeq: Seq[Int]) => {
+        println(s"mapedSeq: ${mapedSeq}")
+      }
+    )
+
+    async.map(
+      Vector(1, 2, 3, 4, 5),
+      (i :Int) => {
+        i * i
+      },
+      (mapedSeq: Seq[Int]) => {
+        println(s"mapedSeq: ${mapedSeq}")
+      }
+    )
+
+    async.map(
+      1 to 100,
+      (i :Int) => {
+        i * i
+      },
+      (mapedSeq: Seq[Int]) => {
+        println(s"mapedSeq: ${mapedSeq}")
+      }
+    )
   }
 }
