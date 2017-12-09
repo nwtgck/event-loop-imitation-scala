@@ -1,15 +1,17 @@
 package io.github.nwtgck.event_loop
 
-import java.io.{BufferedReader, FileReader}
+import java.io.{BufferedReader, FileReader, FileWriter}
 
 
 
 class Fs(eventLoop: EventLoop) {
 
-  class ReadableStream{
+  abstract class ReadableStream{
 
-    protected[this] var onDataCallbacks: List[String => Unit] = List.empty
-    protected[this] var onEndCallbacks : List[Unit => Unit]   = List.empty
+    private[this] var onDataCallbacks: List[String => Unit] = List.empty
+    private[this] var onEndCallbacks : List[Unit => Unit]   = List.empty
+
+
 
     final def onData(f: String => Unit): ReadableStream = {
       onDataCallbacks :+= f
@@ -19,6 +21,37 @@ class Fs(eventLoop: EventLoop) {
       onEndCallbacks  :+= f
       this
     }
+
+    protected[this] def notifyOnData(data: String): Unit = {
+      // Call onData callbacks
+      for(callback <- onDataCallbacks){
+        callback(data)
+      }
+    }
+
+    protected[this] def notifyOnEnd(): Unit = {
+      for(callback <- onEndCallbacks){
+        callback(())
+      }
+    }
+
+    final def pipe(writableStream: WritableStream): Promise[Unit] = new Promise[Unit]{
+      // Enroll to onData-callback
+      onData({(data: String) =>
+        writableStream.write(data)
+      })
+      // Enroll to onEnd-callBack
+      onEnd({_: Unit =>
+        writableStream.end()
+        resolve(())
+      })
+    }
+
+  }
+
+  abstract class WritableStream{
+    def write(data: String): Unit
+    def end(): Unit
   }
 
   /**
@@ -37,6 +70,11 @@ class Fs(eventLoop: EventLoop) {
       })
   }
 
+  /**
+    * Create ReadableStream
+    * @param path
+    * @return
+    */
   def createReadStream(path: String): ReadableStream = new ReadableStream {
 
     val buff   : Array[Char]   = new Array(8196)
@@ -45,15 +83,12 @@ class Fs(eventLoop: EventLoop) {
     def readLoop(): Unit = {
       val read: Int = reader.read(buff)
       if(read == -1){
-        // Call all end-callbacks
-        for(callback <- onEndCallbacks){
-          callback(())
-        }
+        // Notify on-end
+        notifyOnEnd()
       } else {
-        val string = new String(buff, 0, read)
-        for(callback <- onDataCallbacks){
-          callback(string)
-        }
+        val data = new String(buff, 0, read)
+        // Notify on-data
+        notifyOnData(data)
         eventLoop.nextTick{
           readLoop()
         }
@@ -63,6 +98,24 @@ class Fs(eventLoop: EventLoop) {
     // Delay to nextTick
     eventLoop.nextTick{
       readLoop()
+    }
+  }
+
+  /**
+    * Create WritableStream
+    * @param path
+    * @return
+    */
+  def createWriteStream(path: String): WritableStream = new WritableStream {
+
+    val writer = new FileWriter(path)
+
+    override def write(data: String): Unit = {
+      writer.write(data)
+    }
+
+    override def end(): Unit = {
+      writer.close()
     }
   }
 

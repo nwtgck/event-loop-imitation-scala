@@ -175,7 +175,7 @@ object Main extends EventLoop {
 
     }
 
-    if(true){
+    if(false){
       async
         .foreach(1 to 10, (i: Int) => Promise.resolved{
           println(s"async(1) i: ${i}")
@@ -202,6 +202,17 @@ object Main extends EventLoop {
       })
 
 
+    }
+
+    if(true){
+      async
+        .foreach(1 to 10, (i: Int) => Promise.resolved{
+          println(s"async(1) i: ${i}")
+        })
+
+      fs.createReadStream("./build.sbt").pipe(fs.createWriteStream("out.txt")).andThen(_ => Promise.resolved{
+        println("Written!!")
+      })
     }
 
   }
