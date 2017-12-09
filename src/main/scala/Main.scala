@@ -25,31 +25,28 @@ object Main extends EventLoop {
         Seq(1, 2, 3, 4, 5),
         (i: Int) => {
           i * i
-        },
-        (mapedSeq: Seq[Int]) => {
-          println(s"mapedSeq: ${mapedSeq}")
         }
-      )
+      ).andThen((mappedSeq: Seq[Int]) => {
+        println(s"mappedSeq: ${mappedSeq}")
+      })
 
       async.map(
         Vector(1, 2, 3, 4, 5),
         (i: Int) => {
           i * i
-        },
-        (mapedSeq: Seq[Int]) => {
-          println(s"mapedSeq: ${mapedSeq}")
         }
-      )
+      ).andThen((mappedSeq: Seq[Int]) => {
+        println(s"mappedSeq: ${mappedSeq}")
+      })
 
       async.map(
         1 to 100,
         (i: Int) => {
           i * i
-        },
-        (mapedSeq: Seq[Int]) => {
-          println(s"mapedSeq: ${mapedSeq}")
         }
-      )
+      ).andThen((mappedSeq: Seq[Int]) => {
+        println(s"mappedSeq: ${mappedSeq}")
+      })
 
       async.filter(
         1 to 20,
@@ -108,14 +105,14 @@ object Main extends EventLoop {
 
 
       async
-        .mapPromise(
+        .map(
           Vector(1, 2, 3, 4, 5),
           (i: Int) => {
             i * i
           }
         )
-        .andThen((mapedSeq: Seq[Int]) => {
-          println(s"mapedSeq: ${mapedSeq}")
+        .andThen((mappedSeq: Seq[Int]) => {
+          println(s"mappedSeq: ${mappedSeq}")
         })
     }
 
@@ -135,6 +132,17 @@ object Main extends EventLoop {
         .andThen { _ =>
           println("End loop(2)")
         }
+
+      async
+        .map(
+          Vector(1, 2, 3, 4, 5),
+          (i: Int) => {
+            i * i
+          }
+        )
+        .andThen((mappedSeq: Seq[Int]) => {
+          println(s"mappedSeq: ${mappedSeq}")
+        })
     }
 
   }

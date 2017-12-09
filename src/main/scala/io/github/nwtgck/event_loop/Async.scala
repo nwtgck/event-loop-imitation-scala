@@ -23,27 +23,27 @@ class Async(eventLoop: EventLoop) {
     }
   }
 
-  /**
-    * Async map
-    * @param seq
-    * @param f
-    * @param resultCallback
-    * @tparam A
-    * @tparam B
-    */
-  def map[A, B](seq: Seq[A], f: A => B, resultCallback: Seq[B] => Unit): Unit = {
-    seq match {
-      case x +: xs =>
-        eventLoop.nextTick {
-          val mapedX: B = f(x)
-          map(xs, f, (mapedXs: Seq[B]) => {
-            resultCallback(mapedX +: mapedXs)
-          })
-        }
-      case Nil     =>
-        resultCallback(Nil)
-    }
-  }
+//  /**
+//    * Async map
+//    * @param seq
+//    * @param f
+//    * @param resultCallback
+//    * @tparam A
+//    * @tparam B
+//    */
+//  def map[A, B](seq: Seq[A], f: A => B, resultCallback: Seq[B] => Unit): Unit = {
+//    seq match {
+//      case x +: xs =>
+//        eventLoop.nextTick {
+//          val mapedX: B = f(x)
+//          map(xs, f, (mapedXs: Seq[B]) => {
+//            resultCallback(mapedX +: mapedXs)
+//          })
+//        }
+//      case Nil     =>
+//        resultCallback(Nil)
+//    }
+//  }
 
   /**
     * Async map
@@ -52,13 +52,13 @@ class Async(eventLoop: EventLoop) {
     * @tparam A
     * @tparam B
     */
-  def mapPromise[A, B](seq: Seq[A], f: A => B): Promise[Seq[B]] = new Promise[Seq[B]]{
+  def map[A, B](seq: Seq[A], f: A => B): Promise[Seq[B]] = new Promise[Seq[B]]{
     seq match {
       case x +: xs =>
         eventLoop.nextTick {
           val mapedX: B = f(x)
-          map(xs, f, (mapedXs: Seq[B]) => {
-            resolve(mapedX +: mapedXs)
+          map(xs, f).andThen((mappedXs: Seq[B]) => {
+            resolve(mapedX +: mappedXs)
           })
         }
       case Nil     =>
